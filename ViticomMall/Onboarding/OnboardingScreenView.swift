@@ -30,7 +30,8 @@ struct OnboardingScreenView: View {
             .opacity(isAnimating ? 1 : 0)
         }
         .onAppear {
-            withAnimation(.easeInOut(duration: 0.8).delay(0.2)) {
+            // Animación más rápida (0.3s en vez de 0.8s, y menos delay)
+            withAnimation(.easeInOut(duration: 0.3).delay(0.05)) {
                 isAnimating = true
             }
         }
