@@ -7,13 +7,6 @@
 
 import SwiftUI
 import AuthenticationServices
-// Importar vistas separadas
-import OnboardingItem
-import OnboardingContainerView
-import OnboardingScreenView
-import LoginView
-import RegisterView
-import MainAppView
 
 /// Vista principal que decide qué mostrar: Onboarding, Login, Registro o App
 struct ContentView: View {
