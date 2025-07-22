@@ -12,6 +12,7 @@ struct LoginView: View {
     @State private var isLoading: Bool = false
     @Namespace private var animation
     @Environment(\.managedObjectContext) private var viewContext
+    @AppStorage("loggedUser") var loggedUser: String = ""
 
     var body: some View {
         ZStack {
@@ -40,7 +41,7 @@ struct LoginView: View {
                 HStack {
                     Image(systemName: "person.fill")
                         .foregroundColor(.gray)
-                    TextField("Usuario", text: $username)
+                    TextField("Usuario o correo", text: $username)
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                 }
@@ -70,12 +71,17 @@ struct LoginView: View {
                 Button(action: {
                     withAnimation { isLoading = true }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        // Buscar usuario en Core Data
+                        // Buscar usuario en Core Data por username o email
                         let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
-                        fetchRequest.predicate = NSPredicate(format: "username == %@ AND password == %@", username, password)
+                        fetchRequest.predicate = NSPredicate(format: "(username == %@ OR email == %@) AND password == %@", username, username, password)
                         do {
                             let users = try viewContext.fetch(fetchRequest)
-                            if !users.isEmpty || (username == "admin" && password == "1234") {
+                            if let user = users.first {
+                                loggedUser = user.email ?? user.username ?? ""
+                                isLoggedIn = true
+                                showError = false
+                            } else if username == "admin" && password == "1234" {
+                                loggedUser = "admin"
                                 isLoggedIn = true
                                 showError = false
                             } else {
