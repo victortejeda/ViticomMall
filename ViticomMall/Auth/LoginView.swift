@@ -1,5 +1,6 @@
 import SwiftUI
 import AuthenticationServices
+import CoreData
 
 /// Vista de Login profesional con animaciones y social login
 struct LoginView: View {
@@ -10,6 +11,7 @@ struct LoginView: View {
     @State private var showError: Bool = false
     @State private var isLoading: Bool = false
     @Namespace private var animation
+    @Environment(\.managedObjectContext) private var viewContext
 
     var body: some View {
         ZStack {
@@ -67,10 +69,19 @@ struct LoginView: View {
                 // Botón de acceso con animación de carga
                 Button(action: {
                     withAnimation { isLoading = true }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        if username == "admin" && password == "1234" {
-                            isLoggedIn = true
-                        } else {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        // Buscar usuario en Core Data
+                        let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
+                        fetchRequest.predicate = NSPredicate(format: "username == %@ AND password == %@", username, password)
+                        do {
+                            let users = try viewContext.fetch(fetchRequest)
+                            if !users.isEmpty || (username == "admin" && password == "1234") {
+                                isLoggedIn = true
+                                showError = false
+                            } else {
+                                showError = true
+                            }
+                        } catch {
                             showError = true
                         }
                         isLoading = false

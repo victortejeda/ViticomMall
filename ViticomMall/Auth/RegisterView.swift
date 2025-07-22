@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreData
 
 /// Vista de Registro sencilla para crear una nueva cuenta
 struct RegisterView: View {
@@ -9,6 +10,7 @@ struct RegisterView: View {
     @State private var confirmPassword: String = ""
     @State private var showError: Bool = false
     @State private var errorMessage: String = ""
+    @Environment(\.managedObjectContext) private var viewContext
     var body: some View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .top, endPoint: .bottom)
@@ -86,8 +88,18 @@ struct RegisterView: View {
                         errorMessage = "Las contraseñas no coinciden"
                         showError = true
                     } else {
-                        // Aquí iría la lógica real de registro
-                        showRegister = false // Regresa al login
+                        // Guardar usuario en Core Data
+                        let newUser = User(context: viewContext)
+                        newUser.username = username
+                        newUser.email = email
+                        newUser.password = password
+                        do {
+                            try viewContext.save()
+                            showRegister = false // Regresa al login
+                        } catch {
+                            errorMessage = "Error al guardar usuario"
+                            showError = true
+                        }
                     }
                 }) {
                     Text("Crear cuenta")
