@@ -6,6 +6,7 @@ struct Product: Identifiable {
     let name: String
     let imageName: String
     let price: Double
+    let category: String
 }
 
 // Modelo de categoría de ejemplo
@@ -19,6 +20,9 @@ struct Category: Identifiable {
 struct MainAppView: View {
     @Binding var isLoggedIn: Bool
     @AppStorage("loggedUser") var loggedUser: String = ""
+    @State private var selectedCategory: String = "All"
+    @State private var showMenu = false
+    
     // Datos de ejemplo
     let categories: [Category] = [
         Category(name: "Cumpleaños", icon: "birthday.cake"),
@@ -27,19 +31,33 @@ struct MainAppView: View {
         Category(name: "Baby Shower", icon: "gift.fill"),
         Category(name: "Fiestas", icon: "sparkles")
     ]
-    let products: [Product] = [
-        Product(name: "Kit Decoración Cumpleaños", imageName: "balloon.2.fill", price: 35.00),
-        Product(name: "Centro de Mesa Boda", imageName: "heart.circle.fill", price: 45.00),
-        Product(name: "Gorra Graduación", imageName: "graduationcap.fill", price: 20.00),
-        Product(name: "Set Baby Shower", imageName: "gift.fill", price: 50.00),
-        Product(name: "Luces LED Fiesta", imageName: "sparkles", price: 15.00)
+    
+    let allProducts: [Product] = [
+        Product(name: "Kit Decoración Cumpleaños", imageName: "balloon.2.fill", price: 35.00, category: "Cumpleaños"),
+        Product(name: "Centro de Mesa Boda", imageName: "heart.circle.fill", price: 45.00, category: "Bodas"),
+        Product(name: "Gorra Graduación", imageName: "graduationcap.fill", price: 20.00, category: "Graduaciones"),
+        Product(name: "Set Baby Shower", imageName: "gift.fill", price: 50.00, category: "Baby Shower"),
+        Product(name: "Luces LED Fiesta", imageName: "sparkles", price: 15.00, category: "Fiestas"),
+        Product(name: "Globos Metálicos", imageName: "balloon.fill", price: 25.00, category: "Cumpleaños"),
+        Product(name: "Velo de Novia", imageName: "heart.fill", price: 80.00, category: "Bodas"),
+        Product(name: "Toga Graduación", imageName: "graduationcap", price: 30.00, category: "Graduaciones")
     ]
-    @State private var selectedCategory: UUID?
-    @State private var showMenu = false
+    
+    var filteredProducts: [Product] {
+        if selectedCategory == "All" {
+            return allProducts
+        } else {
+            return allProducts.filter { $0.category == selectedCategory }
+        }
+    }
+    
     var body: some View {
-        NavigationView {
+        ZStack {
+            // Fondo principal
+            Color(.systemBackground).ignoresSafeArea()
+            
             VStack(spacing: 0) {
-                // Barra superior
+                // Barra superior con menú y título
                 HStack {
                     Button(action: { showMenu.toggle() }) {
                         Image(systemName: "line.horizontal.3")
@@ -57,31 +75,36 @@ struct MainAppView: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 10)
-                // Categorías
+                .padding(.bottom, 8)
+                
+                // Barra de búsqueda
+                SearchBarView()
+                
+                // Filtro de categorías
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 24) {
+                    HStack(spacing: 16) {
+                        // Botón "All"
+                        CategoryChip(
+                            title: "All",
+                            isSelected: selectedCategory == "All"
+                        ) {
+                            selectedCategory = "All"
+                        }
+                        
+                        // Categorías específicas
                         ForEach(categories) { category in
-                            VStack {
-                                ZStack {
-                                    Circle()
-                                        .fill(selectedCategory == category.id ? Color.blue : Color(.systemGray5))
-                                        .frame(width: 48, height: 48)
-                                    Image(systemName: category.icon)
-                                        .foregroundColor(selectedCategory == category.id ? .white : .gray)
-                                        .font(.title2)
-                                }
-                                Text(category.name)
-                                    .font(.caption)
-                                    .foregroundColor(selectedCategory == category.id ? .blue : .gray)
-                            }
-                            .onTapGesture {
-                                selectedCategory = category.id
+                            CategoryChip(
+                                title: category.name,
+                                isSelected: selectedCategory == category.name
+                            ) {
+                                selectedCategory = category.name
                             }
                         }
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
+                    .padding(.horizontal, 20)
                 }
+                .padding(.vertical, 8)
+                
                 // Banner destacado
                 ZStack(alignment: .bottomLeading) {
                     RoundedRectangle(cornerRadius: 20)
@@ -100,9 +123,10 @@ struct MainAppView: View {
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 8)
-                // Productos destacados
+                
+                // Productos filtrados
                 HStack {
-                    Text("Productos Destacados")
+                    Text("Productos \(selectedCategory == "All" ? "Destacados" : selectedCategory)")
                         .font(.headline)
                     Spacer()
                     Button("Ver todo") {}
@@ -110,51 +134,87 @@ struct MainAppView: View {
                         .foregroundColor(.blue)
                 }
                 .padding(.horizontal)
+                
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 18) {
-                        ForEach(products) { product in
-                            VStack(alignment: .leading, spacing: 8) {
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 15)
-                                        .fill(Color(.systemGray6))
-                                        .frame(width: 130, height: 130)
-                                    Image(systemName: product.imageName)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 60, height: 60)
-                                        .foregroundColor(.purple)
-                                }
-                                Text(product.name)
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .lineLimit(2)
-                                Text("$ \(String(format: "%.2f", product.price))")
-                                    .font(.headline)
-                                    .foregroundColor(.blue)
-                            }
-                            .frame(width: 130)
+                        ForEach(filteredProducts) { product in
+                            ProductCard(product: product)
                         }
                     }
                     .padding(.horizontal)
                 }
                 .padding(.bottom, 8)
+                
                 Spacer()
-                // Barra inferior de navegación
+            }
+            
+            // Tab bar moderna en la parte inferior
+            VStack {
+                Spacer()
+                TabBarView()
+            }
+            
+            // Sidebar (menú lateral)
+            if showMenu {
                 HStack {
-                    Spacer()
-                    Image(systemName: "house.fill").foregroundColor(.blue)
-                    Spacer()
-                    Image(systemName: "square.grid.2x2").foregroundColor(.gray)
-                    Spacer()
-                    Image(systemName: "cart").foregroundColor(.gray)
-                    Spacer()
-                    Image(systemName: "person").foregroundColor(.gray)
+                    SidebarView()
+                        .transition(.move(edge: .leading))
                     Spacer()
                 }
-                .padding(.vertical, 10)
-                .background(Color(.systemGray6))
+                .background(Color.black.opacity(0.3))
+                .onTapGesture {
+                    withAnimation {
+                        showMenu = false
+                    }
+                }
             }
-            .navigationBarHidden(true)
+        }
+        .animation(.easeInOut, value: showMenu)
+    }
+}
+
+struct ProductCard: View {
+    let product: Product
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color(.systemGray6))
+                    .frame(width: 130, height: 130)
+                Image(systemName: product.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
+                    .foregroundColor(.purple)
+            }
+            Text(product.name)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .lineLimit(2)
+            Text("$ \(String(format: "%.2f", product.price))")
+                .font(.headline)
+                .foregroundColor(.blue)
+        }
+        .frame(width: 130)
+    }
+}
+
+struct CategoryChip: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(isSelected ? .semibold : .medium)
+                .foregroundColor(isSelected ? .white : .primary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(isSelected ? Color.blue : Color(.systemGray5))
+                .cornerRadius(20)
         }
     }
 } 
