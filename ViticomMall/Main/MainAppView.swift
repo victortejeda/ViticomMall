@@ -132,36 +132,35 @@ struct MainAppView: View {
                 .padding(.bottom, 8)
                 
                 // Contenido principal basado en la pestaña seleccionada
-                TabView(selection: $selectedTab) {
-                    // Home Tab
-                    HomeContentView(
-                        selectedCategory: $selectedCategory,
-                        categories: categories,
-                        featuredProducts: featuredProducts,
-                        filteredProducts: filteredProducts,
-                        cartManager: cartManager
-                    )
-                    .tag(0)
-                    
-                    // Discover Tab
-                    DiscoverView()
-                        .tag(1)
-                    
-                    // Orders Tab
-                    MyOrderView()
-                        .tag(2)
-                    
-                    // Profile Tab
-                    MyProfileView()
-                        .tag(3)
+                Group {
+                    switch selectedTab {
+                    case 0:
+                        HomeContentView(
+                            selectedCategory: $selectedCategory,
+                            categories: categories,
+                            featuredProducts: featuredProducts,
+                            filteredProducts: filteredProducts,
+                            cartManager: cartManager
+                        )
+                    case 1:
+                        DiscoverView()
+                    case 2:
+                        MyOrderView()
+                    case 3:
+                        MyProfileView()
+                    default:
+                        HomeContentView(
+                            selectedCategory: $selectedCategory,
+                            categories: categories,
+                            featuredProducts: featuredProducts,
+                            filteredProducts: filteredProducts,
+                            cartManager: cartManager
+                        )
+                    }
                 }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 
                 // Tab bar moderna en la parte inferior
-                VStack {
-                    Spacer()
-                    TabBarView(selectedTab: $selectedTab)
-                }
+                TabBarView(selectedTab: $selectedTab)
             }
             
             // Sidebar (menú lateral)
@@ -299,7 +298,7 @@ struct HomeContentView: View {
                     .padding(.horizontal)
                 }
                 
-                Spacer(minLength: 100) // Espacio para el tab bar
+                Spacer(minLength: 20) // Espacio mínimo al final
             }
             .padding(.top, 8)
         }
