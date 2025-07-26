@@ -1,118 +1,169 @@
 import SwiftUI
 
 struct SidebarView: View {
-    @AppStorage("loggedUser") var loggedUser: String = "Sunie Pham"
-    @AppStorage("userEmail") var userEmail: String = "suniexx@gmail.com"
-    @State private var selected: String = "Homepage"
-    @State private var isLightMode: Bool = true
+    @Binding var isDarkMode: Bool
+    @AppStorage("loggedUser") var loggedUser: String = ""
+    @State private var showSettings = false
+    @State private var showSupport = false
+    @State private var showAboutUs = false
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Perfil
-            HStack(spacing: 16) {
+            // Header
+            VStack(spacing: 16) {
                 Image(systemName: "person.crop.circle.fill")
                     .resizable()
-                    .frame(width: 56, height: 56)
+                    .frame(width: 80, height: 80)
                     .foregroundColor(.purple)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(loggedUser)
-                        .font(.headline)
-                    Text(userEmail)
+                
+                VStack(spacing: 4) {
+                    Text(loggedUser.isEmpty ? "Usuario" : loggedUser)
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                    
+                    Text("Cliente Premium")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
             }
-            .padding(.top, 32)
-            .padding(.bottom, 24)
-            .padding(.horizontal)
-            // Navegación principal
-            Group {
-                SidebarItem(icon: "house.fill", label: "Homepage", selected: $selected)
-                SidebarItem(icon: "magnifyingglass", label: "Discover", selected: $selected)
-                SidebarItem(icon: "bag", label: "My Order", selected: $selected)
-                SidebarItem(icon: "person", label: "My profile", selected: $selected)
+            .padding(.top, 40)
+            .padding(.bottom, 30)
+            .padding(.horizontal, 20)
+            
+            // Menu items
+            VStack(spacing: 0) {
+                SidebarMenuItem(
+                    icon: "house",
+                    title: "Inicio",
+                    action: {}
+                )
+                
+                SidebarMenuItem(
+                    icon: "magnifyingglass",
+                    title: "Descubrir",
+                    action: {}
+                )
+                
+                SidebarMenuItem(
+                    icon: "bag",
+                    title: "Mis Pedidos",
+                    action: {}
+                )
+                
+                SidebarMenuItem(
+                    icon: "heart",
+                    title: "Favoritos",
+                    action: {}
+                )
+                
+                SidebarMenuItem(
+                    icon: "person",
+                    title: "Mi Perfil",
+                    action: {}
+                )
+                
+                Divider()
+                    .padding(.vertical, 8)
+                
+                SidebarMenuItem(
+                    icon: "gearshape",
+                    title: "Configuración",
+                    action: { showSettings = true }
+                )
+                
+                SidebarMenuItem(
+                    icon: "questionmark.circle",
+                    title: "Soporte",
+                    action: { showSupport = true }
+                )
+                
+                SidebarMenuItem(
+                    icon: "info.circle",
+                    title: "Acerca de",
+                    action: { showAboutUs = true }
+                )
+                
+                Divider()
+                    .padding(.vertical, 8)
+                
+                // Dark mode toggle
+                HStack {
+                    Image(systemName: isDarkMode ? "moon.fill" : "sun.max.fill")
+                        .foregroundColor(.purple)
+                        .frame(width: 24)
+                    
+                    Text("Modo Oscuro")
+                        .foregroundColor(.primary)
+                    
+                    Spacer()
+                    
+                    Toggle("", isOn: $isDarkMode)
+                        .labelsHidden()
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color(.systemBackground))
             }
-            .padding(.horizontal)
-            // Otros
-            Text("OTHER")
-                .font(.caption2)
-                .foregroundColor(.gray)
-                .padding(.top, 24)
-                .padding(.horizontal)
-            Group {
-                SidebarItem(icon: "gearshape", label: "Setting", selected: $selected)
-                SidebarItem(icon: "envelope", label: "Support", selected: $selected)
-                SidebarItem(icon: "info.circle", label: "About us", selected: $selected)
-            }
-            .padding(.horizontal)
+            
             Spacer()
-            // Selector de modo claro/oscuro
-            HStack {
-                Button(action: { isLightMode = true }) {
-                    HStack {
-                        Image(systemName: "sun.max.fill")
-                        Text("Light")
-                    }
-                    .padding(8)
-                    .background(isLightMode ? Color(.systemGray5) : Color.clear)
-                    .cornerRadius(20)
+            
+            // Logout button
+            Button(action: {
+                // Logout action
+            }) {
+                HStack {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .foregroundColor(.red)
+                    Text("Cerrar Sesión")
+                        .foregroundColor(.red)
+                        .fontWeight(.medium)
                 }
-                .foregroundColor(isLightMode ? .black : .gray)
-                Button(action: { isLightMode = false }) {
-                    HStack {
-                        Image(systemName: "moon.fill")
-                        Text("Dark")
-                    }
-                    .padding(8)
-                    .background(!isLightMode ? Color(.systemGray5) : Color.clear)
-                    .cornerRadius(20)
-                }
-                .foregroundColor(!isLightMode ? .black : .gray)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Color.red.opacity(0.1))
+                .cornerRadius(12)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 24)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 40)
         }
-        .frame(maxWidth: 300)
-        .background(Color(.systemGray6))
-        .cornerRadius(28, corners: [.topRight, .bottomRight])
-        .shadow(radius: 4)
+        .frame(width: 280)
+        .background(Color(.systemBackground))
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
+        .sheet(isPresented: $showSupport) {
+            SupportView()
+        }
+        .sheet(isPresented: $showAboutUs) {
+            AboutUsView()
+        }
     }
 }
 
-struct SidebarItem: View {
+struct SidebarMenuItem: View {
     let icon: String
-    let label: String
-    @Binding var selected: String
+    let title: String
+    let action: () -> Void
+    
     var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.body)
-                .foregroundColor(selected == label ? .blue : .gray)
-            Text(label)
-                .fontWeight(selected == label ? .bold : .regular)
-                .foregroundColor(selected == label ? .blue : .gray)
-            Spacer()
+        Button(action: action) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(.purple)
+                    .frame(width: 24)
+                
+                Text(title)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.gray)
+                    .font(.caption)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
         }
-        .padding(12)
-        .background(selected == label ? Color(.systemGray5) : Color.clear)
-        .cornerRadius(12)
-        .onTapGesture {
-            selected = label
-        }
-    }
-}
-
-// Para esquinas específicas
-fileprivate extension View {
-    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-        clipShape(RoundedCorner(radius: radius, corners: corners))
-    }
-}
-
-fileprivate struct RoundedCorner: Shape {
-    var radius: CGFloat = .infinity
-    var corners: UIRectCorner = .allCorners
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        return Path(path.cgPath)
+        .background(Color(.systemBackground))
     }
 } 
