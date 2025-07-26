@@ -1,31 +1,58 @@
 import SwiftUI
 
 struct NotificationsView: View {
-    @State private var notifications: [NotificationItem] = sampleNotifications
+    @State private var notifications: [NotificationItem] = []
+    @AppStorage("loggedUser") var loggedUser: String = ""
     
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                if notifications.isEmpty {
-                    EmptyNotificationsView()
+                if shouldShowSampleNotifications {
+                    // Mostrar notificaciones de ejemplo para usuarios de prueba
+                    NotificationsWithDataView(notifications: $notifications)
                 } else {
-                    List {
-                        ForEach(notifications) { notification in
-                            NotificationRow(notification: notification)
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
-                        }
-                        .onDelete(perform: deleteNotification)
-                    }
-                    .listStyle(PlainListStyle())
+                    // Mostrar estado vacío para usuarios nuevos
+                    EmptyNotificationsView()
                 }
             }
             .navigationTitle("Notifications")
             .navigationBarTitleDisplayMode(.large)
-            .navigationBarItems(trailing: Button("Clear All") {
-                notifications.removeAll()
-            })
+            .onAppear {
+                if shouldShowSampleNotifications {
+                    notifications = sampleNotifications
+                }
+            }
         }
+    }
+    
+    // Determinar si mostrar notificaciones de ejemplo
+    var shouldShowSampleNotifications: Bool {
+        return loggedUser.lowercased() == "admin" || loggedUser.lowercased() == "test"
+    }
+}
+
+struct NotificationsWithDataView: View {
+    @Binding var notifications: [NotificationItem]
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            if notifications.isEmpty {
+                EmptyNotificationsView()
+            } else {
+                List {
+                    ForEach(notifications) { notification in
+                        NotificationRow(notification: notification)
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                    }
+                    .onDelete(perform: deleteNotification)
+                }
+                .listStyle(PlainListStyle())
+            }
+        }
+        .navigationBarItems(trailing: Button("Clear All") {
+            notifications.removeAll()
+        })
     }
     
     private func deleteNotification(offsets: IndexSet) {

@@ -3,9 +3,11 @@ import SwiftUI
 struct SidebarView: View {
     @Binding var isDarkMode: Bool
     @AppStorage("loggedUser") var loggedUser: String = ""
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     @State private var showSettings = false
     @State private var showSupport = false
     @State private var showAboutUs = false
+    @State private var showLogoutAlert = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -109,7 +111,7 @@ struct SidebarView: View {
             
             // Logout button
             Button(action: {
-                // Logout action
+                showLogoutAlert = true
             }) {
                 HStack {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
@@ -137,6 +139,25 @@ struct SidebarView: View {
         .sheet(isPresented: $showAboutUs) {
             AboutUsView()
         }
+        .alert("Cerrar Sesión", isPresented: $showLogoutAlert) {
+            Button("Cancelar", role: .cancel) { }
+            Button("Cerrar Sesión", role: .destructive) {
+                logout()
+            }
+        } message: {
+            Text("¿Estás seguro de que quieres cerrar sesión?")
+        }
+    }
+    
+    private func logout() {
+        // Limpiar datos del usuario
+        loggedUser = ""
+        isLoggedIn = false
+        
+        // También limpiar otros datos relacionados
+        UserDefaults.standard.removeObject(forKey: "loggedUser")
+        UserDefaults.standard.removeObject(forKey: "userEmail")
+        UserDefaults.standard.set(false, forKey: "isLoggedIn")
     }
 }
 

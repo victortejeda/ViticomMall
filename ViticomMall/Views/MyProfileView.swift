@@ -3,7 +3,9 @@ import SwiftUI
 struct MyProfileView: View {
     @AppStorage("loggedUser") var loggedUser: String = ""
     @AppStorage("userEmail") var userEmail: String = ""
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     @State private var showEditProfile = false
+    @State private var showLogoutAlert = false
     
     var body: some View {
         NavigationView {
@@ -36,9 +38,9 @@ struct MyProfileView: View {
                     
                     // Quick stats
                     HStack(spacing: 20) {
-                        StatCard(title: "Orders", value: "12", icon: "bag")
-                        StatCard(title: "Favorites", value: "8", icon: "heart")
-                        StatCard(title: "Reviews", value: "5", icon: "star")
+                        StatCard(title: "Orders", value: "0", icon: "bag")
+                        StatCard(title: "Favorites", value: "0", icon: "heart")
+                        StatCard(title: "Reviews", value: "0", icon: "star")
                     }
                     .padding(.horizontal, 20)
                     
@@ -57,12 +59,12 @@ struct MyProfileView: View {
                     
                     // Logout button
                     Button(action: {
-                        // Logout action
+                        showLogoutAlert = true
                     }) {
                         HStack {
                             Image(systemName: "rectangle.portrait.and.arrow.right")
                                 .foregroundColor(.red)
-                            Text("Logout")
+                            Text("Cerrar Sesión")
                                 .foregroundColor(.red)
                                 .fontWeight(.medium)
                         }
@@ -80,7 +82,27 @@ struct MyProfileView: View {
             .sheet(isPresented: $showEditProfile) {
                 ProfileFormView()
             }
+            .alert("Cerrar Sesión", isPresented: $showLogoutAlert) {
+                Button("Cancelar", role: .cancel) { }
+                Button("Cerrar Sesión", role: .destructive) {
+                    logout()
+                }
+            } message: {
+                Text("¿Estás seguro de que quieres cerrar sesión?")
+            }
         }
+    }
+    
+    private func logout() {
+        // Limpiar datos del usuario
+        loggedUser = ""
+        userEmail = ""
+        isLoggedIn = false
+        
+        // También limpiar otros datos relacionados
+        UserDefaults.standard.removeObject(forKey: "loggedUser")
+        UserDefaults.standard.removeObject(forKey: "userEmail")
+        UserDefaults.standard.set(false, forKey: "isLoggedIn")
     }
 }
 
