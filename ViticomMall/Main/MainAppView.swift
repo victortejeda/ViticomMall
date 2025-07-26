@@ -198,23 +198,4 @@ struct ProductCard: View {
         }
         .frame(width: 130)
     }
-}
-
-struct CategoryChip: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.subheadline)
-                .fontWeight(isSelected ? .semibold : .medium)
-                .foregroundColor(isSelected ? .white : .primary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(isSelected ? Color.blue : Color(.systemGray5))
-                .cornerRadius(20)
-        }
-    }
 } 
