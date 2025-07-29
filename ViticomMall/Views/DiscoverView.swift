@@ -1,5 +1,31 @@
 import SwiftUI
 
+struct ProductImageView: View {
+    let imageName: String
+    let systemIcon: String
+    let size: CGFloat
+    
+    var body: some View {
+        Group {
+            // Intentar cargar imagen real primero
+            if let _ = UIImage(named: imageName) {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: size, height: size)
+                    .clipped()
+            } else {
+                // Fallback a icono del sistema
+                Image(systemName: systemIcon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: size * 0.6, height: size * 0.6)
+                    .foregroundColor(.purple)
+            }
+        }
+    }
+}
+
 struct DiscoverView: View {
     @State private var searchText = ""
     @State private var selectedCategory = "All"
@@ -84,11 +110,11 @@ struct DiscoverProductCard: View {
                     .fill(Color(.systemGray6))
                     .frame(height: 150)
                 
-                Image(systemName: product.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 60, height: 60)
-                    .foregroundColor(.purple)
+                ProductImageView(
+                    imageName: product.imageName,
+                    systemIcon: product.systemIcon,
+                    size: 60
+                )
                 
                 Button(action: { isFavorite.toggle() }) {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
@@ -133,21 +159,22 @@ struct DiscoverProductCard: View {
 struct DiscoverProduct: Identifiable {
     let id = UUID()
     let name: String
-    let imageName: String
+    let imageName: String // Nombre de la imagen en Assets
+    let systemIcon: String // Icono del sistema como fallback
     let price: Double
     let rating: Double
     let category: String
 }
 
 let discoverProducts: [DiscoverProduct] = [
-    DiscoverProduct(name: "Kit Decoración Cumpleaños Premium", imageName: "balloon.2.fill", price: 45.00, rating: 4.8, category: "Cumpleaños"),
-    DiscoverProduct(name: "Centro de Mesa Boda Elegante", imageName: "heart.circle.fill", price: 65.00, rating: 4.9, category: "Bodas"),
-    DiscoverProduct(name: "Gorra Graduación Personalizada", imageName: "graduationcap.fill", price: 25.00, rating: 4.7, category: "Graduaciones"),
-    DiscoverProduct(name: "Set Baby Shower Completo", imageName: "gift.fill", price: 75.00, rating: 4.6, category: "Baby Shower"),
-    DiscoverProduct(name: "Luces LED RGB Fiesta", imageName: "sparkles", price: 35.00, rating: 4.5, category: "Iluminación"),
-    DiscoverProduct(name: "Globos Metálicos Premium", imageName: "balloon.fill", price: 30.00, rating: 4.4, category: "Decoración"),
-    DiscoverProduct(name: "Velo de Novia Lujoso", imageName: "heart.fill", price: 120.00, rating: 4.9, category: "Bodas"),
-    DiscoverProduct(name: "Toga Graduación Profesional", imageName: "graduationcap", price: 45.00, rating: 4.8, category: "Graduaciones"),
-    DiscoverProduct(name: "Kit Fiesta Temática", imageName: "party.popper", price: 55.00, rating: 4.7, category: "Fiestas"),
-    DiscoverProduct(name: "Decoración Baby Shower Rosa", imageName: "gift.circle", price: 40.00, rating: 4.6, category: "Baby Shower")
+    DiscoverProduct(name: "Kit Decoración Cumpleaños Premium", imageName: "birthday_kit", systemIcon: "balloon.2.fill", price: 45.00, rating: 4.8, category: "Cumpleaños"),
+    DiscoverProduct(name: "Centro de Mesa Boda Elegante", imageName: "wedding_centerpiece", systemIcon: "heart.circle.fill", price: 65.00, rating: 4.9, category: "Bodas"),
+    DiscoverProduct(name: "Gorra Graduación Personalizada", imageName: "graduation_cap", systemIcon: "graduationcap.fill", price: 25.00, rating: 4.7, category: "Graduaciones"),
+    DiscoverProduct(name: "Set Baby Shower Completo", imageName: "baby_shower_set", systemIcon: "gift.fill", price: 75.00, rating: 4.6, category: "Baby Shower"),
+    DiscoverProduct(name: "Luces LED RGB Fiesta", imageName: "led_lights", systemIcon: "sparkles", price: 35.00, rating: 4.5, category: "Iluminación"),
+    DiscoverProduct(name: "Globos Metálicos Premium", imageName: "metallic_balloons", systemIcon: "balloon.fill", price: 30.00, rating: 4.4, category: "Decoración"),
+    DiscoverProduct(name: "Velo de Novia Lujoso", imageName: "wedding_veil", systemIcon: "heart.fill", price: 120.00, rating: 4.9, category: "Bodas"),
+    DiscoverProduct(name: "Toga Graduación Profesional", imageName: "graduation_gown", systemIcon: "graduationcap", price: 45.00, rating: 4.8, category: "Graduaciones"),
+    DiscoverProduct(name: "Kit Fiesta Temática", imageName: "party_kit", systemIcon: "party.popper", price: 55.00, rating: 4.7, category: "Fiestas"),
+    DiscoverProduct(name: "Decoración Baby Shower Rosa", imageName: "baby_shower_pink", systemIcon: "gift.circle", price: 40.00, rating: 4.6, category: "Baby Shower")
 ] 

@@ -1,5 +1,31 @@
 import SwiftUI
 
+struct ProductImageView: View {
+    let imageName: String
+    let systemIcon: String
+    let size: CGFloat
+    
+    var body: some View {
+        Group {
+            // Intentar cargar imagen real primero
+            if let _ = UIImage(named: imageName) {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: size, height: size)
+                    .clipped()
+            } else {
+                // Fallback a icono del sistema
+                Image(systemName: systemIcon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: size * 0.6, height: size * 0.6)
+                    .foregroundColor(.purple)
+            }
+        }
+    }
+}
+
 struct CartView: View {
     @ObservedObject var cartManager: CartManager
     @State private var showCheckout = false
@@ -103,11 +129,11 @@ struct CartItemRow: View {
                     .fill(Color(.systemGray6))
                     .frame(width: 80, height: 80)
                 
-                Image(systemName: item.product.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 40, height: 40)
-                    .foregroundColor(.purple)
+                ProductImageView(
+                    imageName: item.product.imageName,
+                    systemIcon: item.product.systemIcon,
+                    size: 40
+                )
             }
             
             // Product details

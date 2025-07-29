@@ -1,13 +1,16 @@
 import SwiftUI
 
-// Modelo de producto de ejemplo
+// Modelo de producto mejorado con soporte para imágenes reales
 struct Product: Identifiable {
     let id = UUID()
     let name: String
-    let imageName: String
+    let imageName: String // Nombre de la imagen en Assets
+    let systemIcon: String // Icono del sistema como fallback
     let price: Double
     let category: String
     let isFeatured: Bool
+    let description: String
+    let rating: Double
 }
 
 // Modelo de categoría de ejemplo
@@ -41,26 +44,26 @@ struct MainAppView: View {
     
     let allProducts: [Product] = [
         // Productos Destacados
-        Product(name: "Kit Decoración Cumpleaños Premium", imageName: "balloon.2.fill", price: 45.00, category: "Cumpleaños", isFeatured: true),
-        Product(name: "Centro de Mesa Boda Elegante", imageName: "heart.circle.fill", price: 65.00, category: "Bodas", isFeatured: true),
-        Product(name: "Set Baby Shower Completo", imageName: "gift.fill", price: 75.00, category: "Baby Shower", isFeatured: true),
-        Product(name: "Arco de Globos Profesional", imageName: "balloon.2", price: 85.00, category: "Fiestas", isFeatured: true),
+        Product(name: "Kit Decoración Cumpleaños Premium", imageName: "birthday_kit", systemIcon: "balloon.2.fill", price: 45.00, category: "Cumpleaños", isFeatured: true, description: "Kit completo con globos, decoraciones y accesorios", rating: 4.8),
+        Product(name: "Centro de Mesa Boda Elegante", imageName: "wedding_centerpiece", systemIcon: "heart.circle.fill", price: 65.00, category: "Bodas", isFeatured: true, description: "Centro de mesa elegante para bodas", rating: 4.9),
+        Product(name: "Set Baby Shower Completo", imageName: "baby_shower_set", systemIcon: "gift.fill", price: 75.00, category: "Baby Shower", isFeatured: true, description: "Set completo para baby shower", rating: 4.7),
+        Product(name: "Arco de Globos Profesional", imageName: "balloon_arch", systemIcon: "balloon.2", price: 85.00, category: "Fiestas", isFeatured: true, description: "Arco de globos profesional para eventos", rating: 4.6),
         
         // Productos por Categoría
-        Product(name: "Gorra Graduación", imageName: "graduationcap.fill", price: 20.00, category: "Graduaciones", isFeatured: false),
-        Product(name: "Luces LED Fiesta", imageName: "sparkles", price: 15.00, category: "Fiestas", isFeatured: false),
-        Product(name: "Globos Metálicos", imageName: "balloon.fill", price: 25.00, category: "Cumpleaños", isFeatured: false),
-        Product(name: "Velo de Novia", imageName: "heart.fill", price: 80.00, category: "Bodas", isFeatured: false),
-        Product(name: "Toga Graduación", imageName: "graduationcap", price: 30.00, category: "Graduaciones", isFeatured: false),
-        Product(name: "Kit Fiesta Temática", imageName: "party.popper", price: 55.00, category: "Fiestas", isFeatured: false),
-        Product(name: "Decoración Baby Shower Rosa", imageName: "gift.circle", price: 40.00, category: "Baby Shower", isFeatured: false),
-        Product(name: "Mesa de Dulces", imageName: "birthday.cake.fill", price: 65.00, category: "Cumpleaños", isFeatured: false),
-        Product(name: "Cojines Decorativos", imageName: "heart.square", price: 28.00, category: "Bodas", isFeatured: false),
-        Product(name: "Diploma Personalizado", imageName: "doc.text", price: 12.00, category: "Graduaciones", isFeatured: false),
-        Product(name: "Ramo de Globos", imageName: "balloon", price: 32.00, category: "Baby Shower", isFeatured: false),
-        Product(name: "Candeleros Elegantes", imageName: "flame", price: 35.00, category: "Bodas", isFeatured: false),
-        Product(name: "Kit Graduación Completo", imageName: "graduationcap.fill", price: 50.00, category: "Graduaciones", isFeatured: false),
-        Product(name: "Decoración Fiesta Neon", imageName: "lightbulb", price: 42.00, category: "Fiestas", isFeatured: false)
+        Product(name: "Gorra Graduación", imageName: "graduation_cap", systemIcon: "graduationcap.fill", price: 20.00, category: "Graduaciones", isFeatured: false, description: "Gorra de graduación personalizable", rating: 4.5),
+        Product(name: "Luces LED Fiesta", imageName: "led_lights", systemIcon: "sparkles", price: 15.00, category: "Fiestas", isFeatured: false, description: "Luces LED multicolor para fiestas", rating: 4.4),
+        Product(name: "Globos Metálicos", imageName: "metallic_balloons", systemIcon: "balloon.fill", price: 25.00, category: "Cumpleaños", isFeatured: false, description: "Globos metálicos de alta calidad", rating: 4.3),
+        Product(name: "Velo de Novia", imageName: "wedding_veil", systemIcon: "heart.fill", price: 80.00, category: "Bodas", isFeatured: false, description: "Velo de novia elegante", rating: 4.8),
+        Product(name: "Toga Graduación", imageName: "graduation_gown", systemIcon: "graduationcap", price: 30.00, category: "Graduaciones", isFeatured: false, description: "Toga de graduación profesional", rating: 4.6),
+        Product(name: "Kit Fiesta Temática", imageName: "party_kit", systemIcon: "party.popper", price: 55.00, category: "Fiestas", isFeatured: false, description: "Kit completo para fiestas temáticas", rating: 4.5),
+        Product(name: "Decoración Baby Shower Rosa", imageName: "baby_shower_pink", systemIcon: "gift.circle", price: 40.00, category: "Baby Shower", isFeatured: false, description: "Decoración rosa para baby shower", rating: 4.4),
+        Product(name: "Mesa de Dulces", imageName: "candy_table", systemIcon: "birthday.cake.fill", price: 65.00, category: "Cumpleaños", isFeatured: false, description: "Mesa de dulces decorativa", rating: 4.7),
+        Product(name: "Cojines Decorativos", imageName: "decorative_pillows", systemIcon: "heart.square", price: 28.00, category: "Bodas", isFeatured: false, description: "Cojines decorativos para bodas", rating: 4.3),
+        Product(name: "Diploma Personalizado", imageName: "custom_diploma", systemIcon: "doc.text", price: 12.00, category: "Graduaciones", isFeatured: false, description: "Diploma personalizado", rating: 4.2),
+        Product(name: "Ramo de Globos", imageName: "balloon_bouquet", systemIcon: "balloon", price: 32.00, category: "Baby Shower", isFeatured: false, description: "Ramo de globos coloridos", rating: 4.4),
+        Product(name: "Candeleros Elegantes", imageName: "elegant_candles", systemIcon: "flame", price: 35.00, category: "Bodas", isFeatured: false, description: "Candeleros elegantes para bodas", rating: 4.5),
+        Product(name: "Kit Graduación Completo", imageName: "graduation_kit", systemIcon: "graduationcap.fill", price: 50.00, category: "Graduaciones", isFeatured: false, description: "Kit completo de graduación", rating: 4.6),
+        Product(name: "Decoración Fiesta Neon", imageName: "neon_decor", systemIcon: "lightbulb", price: 42.00, category: "Fiestas", isFeatured: false, description: "Decoración neon para fiestas", rating: 4.4)
     ]
     
     var featuredProducts: [Product] {
@@ -305,6 +308,32 @@ struct HomeContentView: View {
     }
 }
 
+struct ProductImageView: View {
+    let imageName: String
+    let systemIcon: String
+    let size: CGFloat
+    
+    var body: some View {
+        Group {
+            // Intentar cargar imagen real primero
+            if let _ = UIImage(named: imageName) {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: size, height: size)
+                    .clipped()
+            } else {
+                // Fallback a icono del sistema
+                Image(systemName: systemIcon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: size * 0.6, height: size * 0.6)
+                    .foregroundColor(.purple)
+            }
+        }
+    }
+}
+
 struct FeaturedProductCard: View {
     let product: Product
     @ObservedObject var cartManager: CartManager
@@ -317,11 +346,11 @@ struct FeaturedProductCard: View {
                     .fill(Color(.systemGray6))
                     .frame(height: 160)
                 
-                Image(systemName: product.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 70, height: 70)
-                    .foregroundColor(.purple)
+                ProductImageView(
+                    imageName: product.imageName,
+                    systemIcon: product.systemIcon,
+                    size: 70
+                )
                 
                 // Badge destacado
                 VStack {
@@ -359,6 +388,16 @@ struct FeaturedProductCard: View {
                     .fontWeight(.semibold)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
+                
+                // Rating
+                HStack(spacing: 4) {
+                    Image(systemName: "star.fill")
+                        .foregroundColor(.yellow)
+                        .font(.caption)
+                    Text(String(format: "%.1f", product.rating))
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
                 
                 HStack {
                     Text("$\(String(format: "%.2f", product.price))")
@@ -401,11 +440,11 @@ struct ProductCard: View {
                     .fill(Color(.systemGray6))
                     .frame(height: 140)
                 
-                Image(systemName: product.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 60, height: 60)
-                    .foregroundColor(.purple)
+                ProductImageView(
+                    imageName: product.imageName,
+                    systemIcon: product.systemIcon,
+                    size: 60
+                )
                 
                 // Botón de favorito
                 Button(action: { 
@@ -428,6 +467,16 @@ struct ProductCard: View {
                     .fontWeight(.medium)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
+                
+                // Rating
+                HStack(spacing: 4) {
+                    Image(systemName: "star.fill")
+                        .foregroundColor(.yellow)
+                        .font(.caption)
+                    Text(String(format: "%.1f", product.rating))
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
                 
                 HStack {
                     Text("$\(String(format: "%.2f", product.price))")
